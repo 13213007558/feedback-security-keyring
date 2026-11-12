@@ -1,4 +1,5 @@
 from .core import (
+    backend_session,
     delete_password,
     get_credential,
     get_keyring,
@@ -8,6 +9,7 @@ from .core import (
 )
 
 __all__ = (
+    'backend_session',
     'delete_password',
     'get_credential',
     'get_keyring',

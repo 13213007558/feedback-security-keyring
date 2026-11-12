@@ -258,6 +258,29 @@ To invoke ``set_keyring``::
     print("password", keyring.get_password("demo-service", "tarek"))
 
 
+Pinning the backend for an operation
+------------------------------------
+
+``set_keyring()`` changes the global selection immediately, so a rotation
+that reads and then writes could otherwise straddle a switch made by another
+thread and end up reading from one backend while writing to another. Wrap
+multi-step work in ``keyring.backend_session()`` to pin one backend
+*generation* for the whole operation::
+
+    with keyring.backend_session() as ring:
+        secret = ring.get_password("demo-service", "tarek")
+        ring.set_password("demo-service", "tarek", rotate(secret))
+
+A session is inherited by nested calls, so helper functions can open their
+own session safely. A switch performed elsewhere takes effect for newly
+started operations, while the pinned (possibly older) backend is kept alive
+until every operation using it finishes and only then released. The
+single-step ``get_password``/``set_password``/``delete_password``/
+``get_credential`` calls open an implicit session around each invocation, so
+ordinary one-off use is unchanged. Backend calls never hold a global lock,
+so a backend that blocks on I/O does not stall an unrelated selection.
+
+
 Disabling Keyring
 =================
 
