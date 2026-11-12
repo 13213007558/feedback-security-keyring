@@ -14,6 +14,14 @@ class PasswordDeleteError(KeyringError):
     """Raised when the password can't be deleted."""
 
 
+class PermissionDeniedError(KeyringError):
+    """Raised when a backend view refuses an out-of-scope operation.
+
+    The view raises this before the underlying backend is touched, so a
+    component cannot probe credentials outside the scope it was granted.
+    """
+
+
 class InitError(KeyringError):
     """Raised when the keyring could not be initialised"""
 
