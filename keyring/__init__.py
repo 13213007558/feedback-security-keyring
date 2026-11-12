@@ -3,6 +3,7 @@ from .core import (
     get_credential,
     get_keyring,
     get_password,
+    scoped_credential,
     set_keyring,
     set_password,
 )
@@ -12,6 +13,7 @@ __all__ = (
     'get_credential',
     'get_keyring',
     'get_password',
+    'scoped_credential',
     'set_keyring',
     'set_password',
 )

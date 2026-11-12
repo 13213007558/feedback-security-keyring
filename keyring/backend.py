@@ -177,6 +177,33 @@ class KeyringBackend(metaclass=KeyringBackendMeta):
                 return credentials.SimpleCredential(username, password)
         return None
 
+    def get_scoped_credential(
+        self,
+        service: str,
+        username: str | None,
+        scope: credentials.credential_scope,
+    ) -> credentials.ScopedCredential:
+        """Return a restricted handle for the credential of the service.
+
+        The returned :class:`~keyring.credentials.ScopedCredential` does not
+        hold the secret; the backend is only consulted when the handle is
+        resolved within *scope*. This is an optional interface: the default
+        binds the existing string-based :meth:`get_credential` (falling back to
+        :meth:`get_password`) lazily, so existing backends gain scoped handles
+        without changes. Backends that want tighter control may override this
+        to supply their own loader.
+        """
+
+        def load() -> credentials.Credential | None:
+            credential = self.get_credential(service, username)
+            if credential is None and username is not None:
+                password = self.get_password(service, username)
+                if password is not None:
+                    credential = credentials.SimpleCredential(username, password)
+            return credential
+
+        return credentials.ScopedCredential(service, username, load)
+
     def set_properties_from_env(self) -> None:
         """For all KEYRING_PROPERTY_* env var, set that property."""
 

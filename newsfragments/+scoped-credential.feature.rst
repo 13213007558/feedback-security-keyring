@@ -1,0 +1,1 @@
+Added an optional scoped-credential interface (``keyring.scoped_credential``) that returns restricted, log-safe handles. A handle dereferences the secret from the backend only while its scope is open, works across threads, and is invalidated on scope exit; the existing string-based ``get_password`` / ``get_credential`` API is unchanged.

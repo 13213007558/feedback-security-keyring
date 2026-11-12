@@ -26,6 +26,10 @@ class NoKeyringError(KeyringError, RuntimeError):
     """Raised when there is no keyring backend"""
 
 
+class CredentialScopeError(KeyringError):
+    """Raised when a scoped credential is dereferenced outside its scope."""
+
+
 class ExceptionRaisedContext:
     """
     An exception-trapping context that indicates whether an exception was

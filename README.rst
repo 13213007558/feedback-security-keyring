@@ -69,6 +69,47 @@ The basic usage of keyring is pretty simple: just call
     >>> keyring.get_password("system", "username")
     'password'
 
+Scoped Credentials
+------------------
+
+Some applications only need the plaintext at one boundary (for example,
+when authenticating to an external service) and would rather pass a
+restricted handle through the rest of the flow. ``scoped_credential``
+opens a scope that issues such handles. The handle never holds the
+secret and the backend is read only when the handle is resolved while
+the scope is open::
+
+    >>> with keyring.scoped_credential() as scope:
+    ...     handle = scope.get("system", "username")
+    ...     credential = handle.resolve()
+    ...     credential.password
+    'password'
+
+The handle is safe to log and to pass around: its ``repr`` and ``str``
+contain only the service, username, and state, never the secret. Once
+the ``with`` block exits, every handle issued by the scope is
+invalidated. Resolving it afterwards raises
+``keyring.errors.CredentialScopeError`` and performs no further backend
+read; a scope cannot be re-entered. Handles may be resolved from any
+thread while the scope remains open. Backend failures raised while
+resolving propagate to the caller, and the handle stays usable for a
+retry until the scope exits.
+
+This interface is optional and coexists with the string-based
+``get_password`` / ``get_credential`` API. Backends need no changes: the
+default implementation lazily bridges to ``get_credential`` (falling
+back to ``get_password``). A backend may override
+``KeyringBackend.get_scoped_credential`` to supply its own loader.
+
+**A note on memory.** Scoping removes *access* and prevents accidental
+disclosure through logging or ``repr``; it does not guarantee physical
+erasure of bytes. Python ``str`` objects are immutable and may be
+interned, copied by the interpreter, or retained in memory until garbage
+collected, and the resolved plaintext is itself a regular string. Treat
+the guarantee as "no longer reachable through the handle and never
+printed unintentionally", not as guaranteed zeroization of process
+memory.
+
 Command-line Utility
 --------------------
 

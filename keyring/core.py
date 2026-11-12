@@ -82,6 +82,22 @@ def get_credential(
     return get_keyring().get_credential(service_name, username)
 
 
+def scoped_credential() -> credentials.credential_scope:
+    """Open a scope that controls when credential handles may be resolved.
+
+    Use the returned scope as a context manager and obtain restricted handles
+    inside the ``with`` block; the secret is fetched from the backend only
+    while the scope is open::
+
+        with keyring.scoped_credential() as scope:
+            handle = scope.get('service', 'user')
+            credential = handle.resolve()
+
+    The handle is safe to log and never exposes the secret outside the scope.
+    """
+    return credentials.credential_scope(get_keyring())
+
+
 def recommended(backend) -> bool:
     return backend.priority >= 1
 
