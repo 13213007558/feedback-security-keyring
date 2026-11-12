@@ -11,6 +11,7 @@ Welcome to |project| documentation!
    :maxdepth: 1
 
    history
+   chainer-policy
 
 .. tidelift-referral-banner::
 

@@ -22,6 +22,22 @@ class KeyringLocked(KeyringError):
     """Raised when the keyring failed unlocking"""
 
 
+class AccessDenied(KeyringError, PermissionError):
+    """
+    Raised when a credential lookup is denied.
+
+    Only a correlation id is exposed.  The reason, outcome, and backend
+    identity are recorded in an audit event that can be joined by the
+    correlation id.  The public exception never contains a username,
+    service, password, backend message, or anything else that could reveal
+    whether an account exists.
+    """
+
+    def __init__(self, correlation_id: str):
+        self.correlation_id = correlation_id
+        super().__init__(f"Credential access denied (ref: {correlation_id})")
+
+
 class NoKeyringError(KeyringError, RuntimeError):
     """Raised when there is no keyring backend"""
 
