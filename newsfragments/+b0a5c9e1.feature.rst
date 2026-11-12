@@ -1,0 +1,8 @@
+``ChainerBackend`` can now bind a credential read to its backend:
+``get_password_source`` and ``get_credential_with_source`` return the
+backend that served the value, and ``rotate_password`` writes the new
+value there rather than to whichever backend is first in priority
+order. The rotation verifies the write before deleting, removes
+duplicate old values only from backends that still serve them, and
+reports undeletable copies in ``RotationReport.delete_failures``. It
+never copies a credential into a backend that did not already hold it.
