@@ -34,6 +34,16 @@ Welcome to |project| documentation!
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: keyring.policy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: keyring.service
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Indices and tables
 ==================

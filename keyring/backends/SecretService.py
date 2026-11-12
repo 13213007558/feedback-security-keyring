@@ -49,6 +49,12 @@ class Keyring(backend.SchemeSelectable, KeyringBackend):
             raise RuntimeError(f"Unable to initialize SecretService: {e}") from e
         return 5
 
+    def service_capability(self) -> str:
+        from ..policy import Capability
+
+        # get_preferred_collection()/unlock() may raise a GUI unlock prompt.
+        return Capability.INTERACTIVE.value
+
     def get_preferred_collection(self):
         """If self.preferred_collection contains a D-Bus path,
         the collection at that address is returned. Otherwise,

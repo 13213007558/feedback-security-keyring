@@ -59,6 +59,12 @@ class Keyring(backend.SchemeSelectable, KeyringBackend):
 
         return 4.8
 
+    def service_capability(self) -> str:
+        from ..policy import Capability
+
+        # libsecret surfaces unlock prompts when a collection is locked.
+        return Capability.INTERACTIVE.value
+
     def get_password(self, service, username):
         """Get password of the username for the service"""
         attributes = self._query(service, username, application=self.appid)

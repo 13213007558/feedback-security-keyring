@@ -118,6 +118,40 @@ class KeyringBackend(metaclass=KeyringBackendMeta):
         keyring_class = type(self)
         return f"{keyring_class.__module__}.{keyring_class.__name__} (priority: {keyring_class.priority:g})"
 
+    def service_capability(self) -> str:
+        """
+        Advertise the security capability for a non-interactive service.
+
+        Return one of the ``Capability`` values defined in
+        :mod:`keyring.policy`:
+
+        * ``'non-interactive'`` -- the backend serves requests without
+          ever prompting a user to unlock anything.
+        * ``'interactive'`` -- the backend may raise an unlock prompt.
+        * ``'unknown'`` -- the backend cannot make a promise (the default).
+
+        The default is deliberately ``'unknown'``: a backend must opt in to
+        a stronger guarantee rather than being trusted by assumption. This
+        hook expresses *security capability*, which is independent of
+        :attr:`priority` (availability/suitability for the environment).
+        """
+        from .policy import Capability
+
+        return Capability.UNKNOWN.value
+
+    def preflight(self, service: str, username: str | None) -> None:
+        """
+        Verify that a read can be served without an interactive unlock.
+
+        Called by the service entry points *before* any credential is read
+        so that a backend which was available at initialization but has
+        since become locked can fail closed. Implementations should raise
+        :class:`keyring.errors.KeyringLocked` when the store cannot be
+        accessed without prompting. The default implementation is a no-op,
+        preserving backends that have no unlock concept.
+        """
+        return None
+
     @abc.abstractmethod
     def get_password(self, service: str, username: str) -> str | None:
         """Get password of the username for the service"""

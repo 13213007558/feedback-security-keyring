@@ -39,6 +39,19 @@ class Keyring(KeyringBackend):
             raise RuntimeError("Security API unavailable")
         return 5
 
+    def service_capability(self) -> str:
+        from ...policy import Capability
+
+        # The Keychain may deny access and surface KeyringLocked at runtime,
+        # but it does not present an interactive unlock prompt itself.
+        return Capability.NON_INTERACTIVE.value
+
+    def preflight(self, service, username):
+        # A denied keychain is reported as KeyringLocked on the first read;
+        # surface it here, before any credential material is requested.
+        if 'api' not in globals():
+            raise KeyringLocked("Security API unavailable")
+
     @warn_keychain
     def set_password(self, service, username, password):
         if username is None:

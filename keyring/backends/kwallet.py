@@ -55,6 +55,12 @@ class DBusKeyring(KeyringBackend):
             return 5.1
         return 4.9
 
+    def service_capability(self) -> str:
+        from ..policy import Capability
+
+        # connected() opens the wallet and may present an unlock prompt.
+        return Capability.INTERACTIVE.value
+
     def __init__(self, *arg, **kw):
         super().__init__(*arg, **kw)
         self.handle = -1

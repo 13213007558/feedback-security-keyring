@@ -31,6 +31,13 @@ class ChainerBackend(backend.KeyringBackend):
     def backends(cls):
         """
         Discover all keyrings for chaining.
+
+        A member is included only when it is both available (positive,
+        resolvable priority) and permitted by the active admission policy.
+        The legacy ``_limit`` predicate is honored when present; when the
+        service layer has installed an admission policy, its full security
+        evaluation additionally guards membership so the chain never relies
+        on an interactive or unknown-capability backend.
         """
 
         def allow(keyring):

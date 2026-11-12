@@ -91,6 +91,12 @@ class WinVaultKeyring(KeyringBackend):
             raise RuntimeError("Requires Windows and pywin32")
         return 5
 
+    def service_capability(self) -> str:
+        from ..policy import Capability
+
+        # Credential Manager reads do not raise an interactive unlock prompt.
+        return Capability.NON_INTERACTIVE.value
+
     @staticmethod
     def _compound_name(username, service):
         return f'{username}@{service}'
